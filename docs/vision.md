@@ -2,32 +2,36 @@
 
 ## One-liner
 
-**openruki is an embeddable plugin that brings low-code into existing open-source products.**
-Maintainers drop it into their project; their users describe a feature they want, and openruki's AI generates the code to build it — either for the whole project or just for a single self-hosted instance.
+**openruki is an installable add-on that brings low-code into self-hosted open-source products.**
+Someone deploys an open-source project, installs openruki inside it, and then — through a simple frontend — describes the feature they want in plain language. openruki's agent builds it into their own deployment.
+
+## Focus: self-hosted, for now
+
+The broad "ship a feature to the whole project for everyone" idea is a hassle to get right today, so it's **deferred.**
+
+**Phase 1 is the self-hosted open-source project.** The target user is someone who took an open-source project, deployed their own copy, and wants to add features specific to *their* instance — but **doesn't know how to code it.** openruki is how they get those features without touching the codebase.
 
 ## The bet (thesis)
 
 Low-code today is good at building *new* apps from scratch. The real gap is **adding low-code _into_ existing, mature products.**
 
-Open-source products are powerful but rigid. Users constantly want features the maintainers can't ship fast enough — and self-hosters want tweaks that only make sense for their own deployment. openruki turns "I wish this app could do X" into a working feature, without forking the codebase or waiting on a roadmap.
+Open-source products are powerful but rigid. Self-hosters constantly want tweaks that only make sense for their own deployment, but they don't have the skills (or time) to implement them. openruki turns "I wish my instance could do X" into a working feature — no fork, no patches to maintain, no waiting on a roadmap.
 
-## How it works
+## How it works (the blueprint)
 
-1. **Maintainer installs openruki** as a plugin/extension on top of their open-source project.
-2. **A user requests a feature** in plain language. *Example: in an open-source WhatsApp, a user asks for "private status — visible to selected people only."*
-3. **openruki asks who it's for:**
-   - **Project-wide** → the maintainer/admin approves, and the feature is built for *everyone* on the project.
-   - **Instance-only** → a self-hoster builds it for *their own deployment* only.
-4. **AI generates the code** — primarily backend logic plus the wiring into the existing product — and integrates it.
+1. **The host project is deployed.** A user self-hosts an open-source project (the "foundation project").
+2. **They install openruki inside it** as an add-on.
+3. **openruki gives them a frontend UI.** They log in with email + password.
+4. **They point at what they want to change** — which page / which part of the product they want to build something on, and import/select it.
+5. **They give the command** — in plain language, they describe the feature they want added to their self-hosted instance.
+6. **The openruki agent builds it** into their deployment.
 
 Because openruki lives inside the host product, generated features reuse the product's existing patterns and conventions rather than living as a bolted-on separate app.
 
 ## Who it's for
 
-- **OSS maintainers** — give their community a way to extend the product, and a path to approve/ship the good ideas to everyone.
-- **Self-hosters** — customize their own instance freely, without forking or maintaining patches.
-
-(End users benefit indirectly: the features they want actually get built.)
+- **Self-hosters of open-source projects** (Phase 1) — people running their own copy who want instance-specific features but can't build them by hand.
+- **OSS maintainers / project-wide rollout** — *deferred to a later phase.*
 
 ## Why "open" + the name
 
@@ -35,8 +39,10 @@ openruki is itself open-source and designed to sit on top of *other* open-source
 
 ## Open questions / TODO
 
-- [ ] Monetization model (premium features? hosted build service? per-instance licensing?)
+- [ ] How the add-on installs into an arbitrary host project (package? sidecar service? code injection?)
+- [ ] How openruki gets enough access to the host's pages/code to build into them safely
 - [ ] First target host project to prototype against (e.g. an open-source chat app)
-- [ ] How generated features are reviewed, tested, and merged safely
-- [ ] Boundary between "config toggle" features and "AI-generated code" features
+- [ ] Auth: is the email+password login openruki's own, or tied to the host project's accounts?
 - [ ] Sandboxing / security model for AI-generated code in production
+- [ ] Monetization model (premium features? hosted build service? per-instance licensing?)
+- [ ] When/how to revisit project-wide rollout (Phase 2)
