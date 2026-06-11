@@ -1,0 +1,20 @@
+# Development image for the frontend — runs the Vite dev server with HMR.
+# Source is bind-mounted by docker-compose; node_modules lives in a named
+# volume so the container's install isn't shadowed by the host.
+FROM node:24-slim
+
+WORKDIR /app
+
+# Enable pnpm via corepack.
+RUN corepack enable
+
+# Install dependencies first (cached unless the lockfile changes).
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Fallback copy for building without a mount.
+COPY . .
+
+EXPOSE 5173
+
+CMD ["pnpm", "dev", "--host"]

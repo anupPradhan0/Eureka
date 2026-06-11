@@ -42,7 +42,27 @@ rollout for maintainers is deferred to a later phase.
 ## Repository layout
 
 ```
-backend/    FastAPI app (routes → services → repositories → models)
-frontend/   Vite + React + TypeScript app
-docs/        vision and tech-stack docs
+backend/            FastAPI app (routes → services → repositories → models)
+frontend/           Vite + React + TypeScript app
+docs/               vision and tech-stack docs
+docker-compose.yml  dev stack (backend + frontend + MongoDB) with hot reload
 ```
+
+## Development (Docker, hot reload)
+
+The whole stack runs in Docker with live reload — edit files on your host and
+the containers pick up changes automatically.
+
+```bash
+docker compose up --build
+```
+
+- Frontend (Vite + HMR): http://localhost:5173
+- Backend (FastAPI + uvicorn --reload): http://localhost:8000 — docs at `/docs`
+- MongoDB: localhost:27017
+
+Source folders are bind-mounted; `node_modules` and the Python install live in
+the images / named volumes so the host can't shadow them. Stop with
+`docker compose down` (add `-v` to also drop the Mongo data volume).
+
+Prefer running without Docker? See `backend/README.md` and `frontend/README.md`.

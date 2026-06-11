@@ -1,0 +1,65 @@
+# Development stack with hot reloading.
+#
+#   docker compose up
+#
+# - backend  : FastAPI + uvicorn --reload (http://localhost:8000)
+# - frontend : Vite dev server + HMR      (http://localhost:5173)
+# - mongo    : MongoDB                     (localhost:27017)
+#
+# Source folders are bind-mounted, so edits on the host reload live in the
+# containers. node_modules and the python venv are kept in the image / named
+# volumes so the host doesn't shadow them.
+
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB_NAME: openruki
+      APP_ENV: development
+    volumes:
+      # Live source for hot reload; keep the image's installed package metadata.
+      - ./backend:/app
+      - /app/openruki_backend.egg-info
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      # Browser talks to the backend on the host port mapping.
+      VITE_API_URL: http://localhost:8000
+    volumes:
+      # Live source for HMR; named volume keeps container node_modules.
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  frontend_node_modules:

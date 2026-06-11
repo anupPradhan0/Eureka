@@ -1,0 +1,18 @@
+# Development image for the backend — runs uvicorn with --reload.
+# Source is bind-mounted by docker-compose, so code edits hot-reload live.
+FROM python:3.13-slim
+
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1
+
+# Copy the project, then install it editable with dev extras. Source is also
+# bind-mounted at runtime so edits hot-reload; this COPY is the build fallback.
+COPY . .
+RUN pip install -e ".[dev]"
+
+EXPOSE 8000
+
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
