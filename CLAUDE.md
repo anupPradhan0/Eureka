@@ -70,6 +70,18 @@ MongoDB Model
 
 Use **pnpm** for all package management and scripts. Do not use npm or yarn.
 
+## Development
+
+Start the dev environment with Docker hot reloading:
+
+```bash
+docker compose up --build
+```
+
+This runs the backend, frontend, and MongoDB together with live reload — edit
+files on the host and the containers reload automatically. Do not run the dev
+servers manually unless Docker is unavailable.
+
 ## Communication Style
 
 - Answer only what is asked. No extra jargon, no filler, no unrequested information.

@@ -1,0 +1,165 @@
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --surface: #faf9fb;
+  --border: #e5e4e7;
+  --accent: #aa3bff;
+  --accent-contrast: #fff;
+  --error: #d12e5a;
+
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 16px/1.5 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light dark;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --surface: #1f2028;
+    --border: #2e303a;
+    --accent: #c084fc;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2 {
+  color: var(--text-h);
+  font-weight: 600;
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input {
+  font: inherit;
+}
+
+/* --- Auth screen --- */
+.auth {
+  max-width: 380px;
+  margin: 10vh auto;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.auth__tagline {
+  margin: 8px 0 28px;
+  color: var(--text);
+}
+
+.auth__tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.auth__tabs button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.auth__tabs button.is-active {
+  border-color: var(--accent);
+  color: var(--text-h);
+}
+
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.auth__form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-h);
+}
+
+.auth__form input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.auth__form button[type="submit"] {
+  margin-top: 8px;
+  padding: 11px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+}
+
+.auth__form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.auth__error {
+  color: var(--error);
+  font-size: 14px;
+  margin: 0;
+}
+
+/* --- Home screen --- */
+.home__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.home__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.home__user button {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.home__main {
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.app-loading {
+  margin: 20vh auto;
+  text-align: center;
+}
