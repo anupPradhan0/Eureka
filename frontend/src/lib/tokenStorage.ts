@@ -2,7 +2,7 @@
  * Single place that knows how the access token is persisted.
  * Swapping storage (e.g. to cookies) only touches this file.
  */
-const TOKEN_KEY = "openruki.access_token";
+const TOKEN_KEY = "eureka.access_token";
 
 export const tokenStorage = {
   get(): string | null {

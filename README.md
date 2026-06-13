@@ -1,27 +1,27 @@
-# openruki
+# Eureka
 
 **Low-code, built _into_ your self-hosted open-source apps.**
 
-openruki is an installable add-on for self-hosted open-source projects. You deploy
-your own copy of an open-source product, drop openruki inside it, log in, point at a
-page, and describe the feature you want in plain language — openruki's agent builds it
+Eureka is an installable add-on for self-hosted open-source projects. You deploy
+your own copy of an open-source product, drop Eureka inside it, log in, point at a
+page, and describe the feature you want in plain language — Eureka's agent builds it
 into your instance. No fork, no patches to maintain, no coding required.
 
 ## Why
 
 Low-code today is great at building *new* apps. The gap is adding low-code *into*
 existing, mature products. Self-hosters constantly want tweaks specific to their own
-deployment but don't have the skills or time to implement them. openruki turns
+deployment but don't have the skills or time to implement them. Eureka turns
 "I wish my instance could do X" into a working feature.
 
 ## How it works
 
 1. Self-host an open-source project (the "foundation project").
-2. Install openruki inside it as an add-on.
-3. Log in to openruki's UI (email + password).
+2. Install Eureka inside it as an add-on.
+3. Log in to Eureka's UI (email + password).
 4. Point at the page / part you want to change.
 5. Describe the feature you want.
-6. The openruki agent builds it into your deployment.
+6. The Eureka agent builds it into your deployment.
 
 ## Tech stack
 

@@ -1,6 +1,6 @@
-# openruki — backend
+# Eureka — backend
 
-FastAPI service for openruki, organized as a strict layered architecture.
+FastAPI service for Eureka, organized as a strict layered architecture.
 
 ## Architecture
 

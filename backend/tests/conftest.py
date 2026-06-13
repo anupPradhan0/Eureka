@@ -14,7 +14,7 @@ from src.services.user_service import UserService
 @pytest.fixture
 def mongo_db():
     client = AsyncMongoMockClient()
-    return client["openruki_test"]
+    return client["eureka_test"]
 
 
 @pytest.fixture
