@@ -5,16 +5,14 @@ plaintext), plus a non-reversible display hint.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
 
+from ..core.utils import utcnow
+
 COLLECTION_NAME = "ai_configs"
-
-
-def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
 
 
 class AIConfigModel(BaseModel):
@@ -26,8 +24,8 @@ class AIConfigModel(BaseModel):
     model: str
     api_key_encrypted: str
     key_hint: str
-    created_at: datetime = Field(default_factory=_utcnow)
-    updated_at: datetime = Field(default_factory=_utcnow)
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
 
     @classmethod
     def from_document(cls, document: dict[str, Any]) -> "AIConfigModel":
@@ -38,6 +36,6 @@ class AIConfigModel(BaseModel):
             model=document["model"],
             api_key_encrypted=document["api_key_encrypted"],
             key_hint=document["key_hint"],
-            created_at=document.get("created_at", _utcnow()),
-            updated_at=document.get("updated_at", _utcnow()),
+            created_at=document.get("created_at", utcnow()),
+            updated_at=document.get("updated_at", utcnow()),
         )

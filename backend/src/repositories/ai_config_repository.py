@@ -39,6 +39,8 @@ class AIConfigRepository(BaseRepository, IAIConfigRepository):
             upsert=True,
             return_document=True,
         )
+        if document is None:  # an upsert should always return a document
+            raise RuntimeError("AI config upsert returned no document.")
         return AIConfigModel.from_document(document)
 
     async def ensure_indexes(self) -> None:

@@ -43,10 +43,11 @@ def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
-    # CORS — the frontend (Vite) runs on a different origin in development.
+    # CORS — the frontend (Vite) runs on a different origin; origins are
+    # configurable via ALLOWED_ORIGINS so non-dev deployments work.
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:5173"],
+        allow_origins=settings.cors_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

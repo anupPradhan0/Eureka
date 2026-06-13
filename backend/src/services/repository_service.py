@@ -8,10 +8,10 @@ into this layer.
 from __future__ import annotations
 
 import re
-from datetime import datetime, timezone
 
 from ..core.crypto import decrypt_secret, encrypt_secret
 from ..core.exceptions import NotFoundError
+from ..core.utils import utcnow
 from ..models.repository_model import RepositoryModel
 from ..providers.github.client import GitHubClient
 from ..providers.github.url_parser import parse_repo_url
@@ -37,10 +37,6 @@ _DOC_RULES: list[tuple[DocCategory, re.Pattern[str]]] = [
 _DOC_DIRS = {"", ".github", "docs"}
 
 
-def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
-
-
 class RepositoryService:
     def __init__(
         self,
@@ -48,11 +44,13 @@ class RepositoryService:
         github_client: GitHubClient,
         encryption_key: str,
         tree_max_entries: int,
+        readme_max_chars: int,
     ) -> None:
         self._repo = repository
         self._github = github_client
         self._encryption_key = encryption_key
         self._tree_max_entries = tree_max_entries
+        self._readme_max_chars = readme_max_chars
 
     async def import_repo(
         self, user_id: str, payload: RepoImportRequest
@@ -60,7 +58,7 @@ class RepositoryService:
         owner, repo = parse_repo_url(payload.url)
         summary = await self._build_summary(owner, repo, payload.github_token)
 
-        now = _utcnow()
+        now = utcnow()
         token_encrypted = (
             encrypt_secret(payload.github_token, self._encryption_key)
             if payload.github_token
@@ -94,7 +92,7 @@ class RepositoryService:
         )
         summary = await self._build_summary(model.owner, model.name, token)
         model.summary = summary.model_dump(mode="json")
-        model.updated_at = _utcnow()
+        model.updated_at = utcnow()
         await self._repo.upsert(model)
         return summary
 
@@ -135,6 +133,9 @@ class RepositoryService:
             if readme_path
             else None
         )
+        # Cap stored/returned README so a huge file can't bloat the document/response.
+        if readme is not None and len(readme) > self._readme_max_chars:
+            readme = readme[: self._readme_max_chars] + "\n\n… (truncated)"
 
         return RepoSummaryResponse(
             owner=owner,

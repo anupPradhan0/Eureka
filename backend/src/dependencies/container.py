@@ -79,6 +79,7 @@ def get_repository_controller(
         github_client,
         settings.encryption_key,
         settings.github_tree_max_entries,
+        settings.readme_max_chars,
     )
     return RepositoryController(service)
 

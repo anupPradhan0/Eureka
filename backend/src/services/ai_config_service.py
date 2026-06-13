@@ -7,19 +7,14 @@ provider registry.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
-
 import httpx
 
 from ..core.crypto import encrypt_secret, mask_hint
+from ..core.utils import utcnow
 from ..models.ai_config_model import AIConfigModel
 from ..providers.ai.registry import get_provider
 from ..repositories.interfaces.iai_config_repository import IAIConfigRepository
 from ..schemas.ai_config_schema import AIConfigResponse, AIConfigSaveRequest
-
-
-def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
 
 
 class AIConfigService:
@@ -46,7 +41,7 @@ class AIConfigService:
         await provider.validate(payload.model, payload.api_key, self._http)
 
         # 2. Encrypt and persist.
-        now = _utcnow()
+        now = utcnow()
         config = AIConfigModel(
             user_id=user_id,
             provider=payload.provider,

@@ -40,6 +40,8 @@ class RepositoryRepository(BaseRepository, IRepositoryRepository):
             upsert=True,
             return_document=True,
         )
+        if document is None:  # an upsert should always return a document
+            raise RuntimeError("Repository upsert returned no document.")
         return RepositoryModel.from_document(document)
 
     async def delete_by_user_id(self, user_id: str) -> bool:

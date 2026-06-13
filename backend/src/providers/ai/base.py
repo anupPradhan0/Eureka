@@ -22,7 +22,12 @@ class IAIProvider(ABC):
 
     @abstractmethod
     async def validate(self, model: str, api_key: str, client: httpx.AsyncClient) -> None:
-        """Confirm the API key works. Raise an :class:`AppError` on failure."""
+        """Confirm the API key works. Raise an :class:`AppError` on failure.
+
+        Note: this validates the **API key only** (via the provider's list/key
+        endpoint). The ``model`` name is not verified here — an unknown model is
+        accepted at save time and would only surface when inference is attempted.
+        """
 
 
 def _raise_for_status(response: httpx.Response, provider: str) -> None:

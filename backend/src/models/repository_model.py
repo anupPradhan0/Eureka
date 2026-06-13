@@ -6,16 +6,14 @@ resume instantly without re-hitting GitHub.
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel, Field
 
+from ..core.utils import utcnow
+
 COLLECTION_NAME = "repositories"
-
-
-def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
 
 
 class RepositoryModel(BaseModel):
@@ -27,8 +25,8 @@ class RepositoryModel(BaseModel):
     default_branch: str
     github_token_encrypted: str | None = None
     summary: dict[str, Any]
-    created_at: datetime = Field(default_factory=_utcnow)
-    updated_at: datetime = Field(default_factory=_utcnow)
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
 
     @classmethod
     def from_document(cls, document: dict[str, Any]) -> "RepositoryModel":
@@ -41,6 +39,6 @@ class RepositoryModel(BaseModel):
             default_branch=document["default_branch"],
             github_token_encrypted=document.get("github_token_encrypted"),
             summary=document.get("summary", {}),
-            created_at=document.get("created_at", _utcnow()),
-            updated_at=document.get("updated_at", _utcnow()),
+            created_at=document.get("created_at", utcnow()),
+            updated_at=document.get("updated_at", utcnow()),
         )

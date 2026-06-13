@@ -64,11 +64,14 @@ def _full_handler(hosts: list[str]):
     return handler
 
 
-def _service(mongo_db, key: str, handler):
+def _service(mongo_db, key: str, handler, readme_max_chars: int = 50_000):
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     github = GitHubClient(client, timeout=5.0)
     repo = RepositoryRepository(mongo_db)
-    return RepositoryService(repo, github, key, tree_max_entries=5000), repo
+    service = RepositoryService(
+        repo, github, key, tree_max_entries=5000, readme_max_chars=readme_max_chars
+    )
+    return service, repo
 
 
 async def test_import_builds_and_persists_summary(mongo_db, encryption_key):
@@ -145,6 +148,68 @@ async def test_missing_repo_maps_to_not_found(mongo_db, encryption_key):
         await service.import_repo(
             "u", RepoImportRequest(url="https://github.com/owner/repo")
         )
+
+
+async def test_refresh_updates_stored_snapshot(mongo_db, encryption_key):
+    stars = {"value": 42}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path == "/repos/owner/repo":
+            return httpx.Response(200, json={**_REPO_META, "stargazers_count": stars["value"]})
+        if path == "/repos/owner/repo/contributors":
+            return httpx.Response(200, json=[{}])
+        if path == "/repos/owner/repo/git/trees/main":
+            return httpx.Response(200, json=_TREE)
+        if path.startswith("/repos/owner/repo/contents/"):
+            return httpx.Response(200, json={"content": base64.b64encode(b"# Hi").decode()})
+        return httpx.Response(404, json={})
+
+    service, _ = _service(mongo_db, encryption_key, handler)
+    imported = await service.import_repo(
+        "user1", RepoImportRequest(url="https://github.com/owner/repo")
+    )
+    assert imported.stars == 42
+
+    stars["value"] = 100
+    refreshed = await service.refresh("user1")
+    assert refreshed.stars == 100
+    # The persisted snapshot reflects the refresh, not the original import.
+    assert (await service.get_current("user1")).stars == 100
+
+
+async def test_refresh_without_import_raises(mongo_db, encryption_key):
+    service, _ = _service(mongo_db, encryption_key, _full_handler([]))
+    with pytest.raises(NotFoundError):
+        await service.refresh("nobody")
+
+
+async def test_readme_is_capped(mongo_db, encryption_key):
+    big = b"# Title\n" + b"x" * 1000
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        path = request.url.path
+        if path == "/repos/owner/repo":
+            return httpx.Response(200, json=_REPO_META)
+        if path == "/repos/owner/repo/contributors":
+            return httpx.Response(200, json=[{}])
+        if path == "/repos/owner/repo/git/trees/main":
+            return httpx.Response(200, json={"truncated": False, "tree": [
+                {"path": "README.md", "type": "blob", "size": 1000},
+            ]})
+        if path.startswith("/repos/owner/repo/contents/"):
+            return httpx.Response(200, json={"content": base64.b64encode(big).decode()})
+        return httpx.Response(404, json={})
+
+    service, _ = _service(mongo_db, encryption_key, handler, readme_max_chars=100)
+    summary = await service.import_repo(
+        "u", RepoImportRequest(url="https://github.com/owner/repo")
+    )
+    assert summary.readme is not None
+    assert summary.readme.startswith("# Title")
+    assert "… (truncated)" in summary.readme
+    # capped to 100 chars + the truncation marker
+    assert len(summary.readme) <= 100 + len("\n\n… (truncated)")
 
 
 async def test_delete_clears_current(mongo_db, encryption_key):
