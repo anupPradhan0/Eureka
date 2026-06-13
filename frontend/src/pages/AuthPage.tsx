@@ -29,7 +29,7 @@ export function AuthPage() {
 
   return (
     <div className="auth">
-      <h1>openruki</h1>
+      <h1>Eureka</h1>
       <p className="auth__tagline">
         Low-code, built into your self-hosted open-source apps.
       </p>

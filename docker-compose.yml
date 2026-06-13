@@ -33,12 +33,12 @@ services:
       - "8000:8000"
     environment:
       MONGODB_URI: mongodb://mongo:27017
-      MONGODB_DB_NAME: openruki
+      MONGODB_DB_NAME: eureka
       APP_ENV: development
     volumes:
       # Live source for hot reload; keep the image's installed package metadata.
       - ./backend:/app
-      - /app/openruki_backend.egg-info
+      - /app/eureka_backend.egg-info
     depends_on:
       mongo:
         condition: service_healthy

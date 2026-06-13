@@ -31,3 +31,13 @@ class NotFoundError(AppError):
 
 class ConflictError(AppError):
     status_code = 409
+
+
+class UpstreamError(AppError):
+    """A third-party service (AI provider, GitHub) failed or was unreachable."""
+
+    status_code = 502
+
+
+class ServiceUnavailableError(AppError):
+    status_code = 503

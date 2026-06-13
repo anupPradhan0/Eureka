@@ -2,9 +2,9 @@
 
 ## About the Project
 
-**openruki** is a low-code add-on installed *inside* self-hosted open-source apps. The user deploys their own copy of an open-source product (the "foundation project"), drops openruki inside it, logs in, points at a page, and describes a feature in plain language — openruki's AI agent builds that feature directly into their instance. No fork, no patches, no coding required.
+**Eureka** is a low-code add-on installed *inside* self-hosted open-source apps. The user deploys their own copy of an open-source product (the "foundation project"), drops Eureka inside it, logs in, points at a page, and describes a feature in plain language — Eureka's AI agent builds that feature directly into their instance. No fork, no patches, no coding required.
 
-The gap it fills: low-code today builds *new* apps, but openruki adds low-code *into* existing mature products, so self-hosters can get custom tweaks without the skills or time to code them.
+The gap it fills: low-code today builds *new* apps, but Eureka adds low-code *into* existing mature products, so self-hosters can get custom tweaks without the skills or time to code them.
 
 - **Frontend:** Vite + React + TypeScript + TanStack Query
 - **Backend:** FastAPI (Python)
