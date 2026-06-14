@@ -15,6 +15,16 @@ The UI the self-hoster logs into and uses to describe features.
 
 - **FastAPI (Python)** — API server
 - **Python** — language for backend + API logic
+- **MongoDB** — data store (users, AI config, imported repos)
+
+## AI access (bring your own key)
+
+Eureka ships **no AI access of its own** — being open-source, each self-hoster
+supplies their own key. The user configures a provider, model, and API key, which
+is validated live and stored encrypted at rest.
+
+- **Providers:** Anthropic, OpenAI, OpenRouter, Google Gemini
+- This configures *which model Eureka uses*; the agent that consumes it is below.
 
 ## The agent
 
@@ -40,5 +50,7 @@ Eureka sits *inside* a self-hosted open-source project. So a lot is determined b
 | Frontend framework | React + TypeScript |
 | Frontend data | TanStack Query |
 | Backend API | FastAPI (Python) |
+| Data store | MongoDB |
+| AI access | BYO key — Anthropic / OpenAI / OpenRouter / Gemini |
 | Agent | TBD |
 | Generated feature code | depends on host project |

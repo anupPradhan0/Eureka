@@ -26,20 +26,54 @@ not concrete database code (Dependency Inversion).
 
 ```
 src/
-├── app.py                  # FastAPI entry point
+├── app.py                  # FastAPI entry point (router registration, lifespan, CORS)
 ├── config/                 # settings + MongoDB connection
-├── routes/                 # route definitions
+├── routes/                 # route definitions (auth, ai-config, repository, health)
 ├── controllers/            # HTTP request/response handling
 ├── services/               # business logic
 ├── repositories/
-│   ├── interfaces/         # abstractions
+│   ├── interfaces/         # abstractions (one per aggregate)
 │   ├── base_repository.py  # generic CRUD
-│   └── user_repository.py  # concrete Mongo implementation
+│   └── *_repository.py     # concrete Mongo implementations
+├── providers/              # outbound integrations
+│   ├── ai/                 # BYO AI providers (anthropic/openai/openrouter/gemini) + registry
+│   └── github/             # GitHub API client + SSRF-guarded URL parser
 ├── models/                 # DB entities
 ├── schemas/                # pydantic request/response DTOs
-├── core/                   # security, exceptions
-└── dependencies/           # dependency injection wiring
+├── core/                   # security, crypto, exceptions, utils
+└── dependencies/           # DI wiring (incl. the shared httpx client)
 ```
+
+## API
+
+All routes are under `/api`, JSON, and require a Bearer token except where noted.
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/health` | Liveness (no auth) |
+| POST | `/api/auth/register` | Create account, returns a token |
+| POST | `/api/auth/login` | Authenticate, returns a token |
+| GET | `/api/auth/me` | Current user |
+| GET | `/api/ai-config` | AI config status (never returns the key) |
+| PUT | `/api/ai-config` | Validate the key live, then save provider/model/key |
+| GET | `/api/repository` | Current imported repo summary (404 if none) |
+| POST | `/api/repository/import` | Fetch + persist a repo summary |
+| POST | `/api/repository/refresh` | Re-fetch the current repo |
+| DELETE | `/api/repository` | Clear the current repo |
+
+## Configuration
+
+Settings load from `.env` (copy `.env.example`). Key variables:
+
+- `MONGODB_URI`, `MONGODB_DB_NAME`
+- `JWT_SECRET`, `JWT_ALGORITHM`, `JWT_EXPIRES_MINUTES`
+- `ENCRYPTION_KEY` — Fernet key encrypting BYO API keys / GitHub tokens at rest
+- `ALLOWED_ORIGINS` — comma-separated CORS origins
+- `AI_HTTP_TIMEOUT_SECONDS`, `GITHUB_HTTP_TIMEOUT_SECONDS`, `GITHUB_TREE_MAX_ENTRIES`, `README_MAX_CHARS`
+
+In `APP_ENV=production` the app refuses to start while `ENCRYPTION_KEY` or
+`JWT_SECRET` are left at their dev defaults. Secrets are encrypted at rest and
+never returned to clients — responses carry only a masked hint (e.g. `••••1234`).
 
 ## Setup
 

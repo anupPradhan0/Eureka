@@ -23,10 +23,31 @@ deployment but don't have the skills or time to implement them. Eureka turns
 5. Describe the feature you want.
 6. The Eureka agent builds it into your deployment.
 
+## What works today
+
+The onboarding flow is implemented end-to-end (the agent that actually builds
+features is still TBD). After logging in, a user is guided through three gated
+steps:
+
+1. **Configure an AI model (bring your own key).** Eureka ships no AI access of
+   its own — you pick a provider (**Anthropic, OpenAI, OpenRouter, or Google
+   Gemini**), a model, and an API key. The key is validated live against the
+   provider, encrypted at rest, and never returned to the browser.
+2. **Import a repository.** Paste the GitHub URL of the project you'll build into
+   (optionally with a token for private repos / higher rate limits).
+3. **Review the summary.** Eureka shows the project's description, stars,
+   contributor count, file count, full file tree, and documentation files
+   (README, Code of Conduct, Contributing, License, Security) with the README
+   shown. Stats GitHub can't provide are simply hidden.
+
+The imported repo is remembered between sessions (refresh to re-fetch, or import
+a different one).
+
 ## Tech stack
 
 - **Frontend:** Vite + React + TypeScript + TanStack Query
-- **Backend:** FastAPI (Python)
+- **Backend:** FastAPI (Python) + MongoDB
+- **AI:** bring-your-own-key — Anthropic / OpenAI / OpenRouter / Gemini
 - **Agent:** TBD
 
 ## Status
@@ -42,9 +63,10 @@ rollout for maintainers is deferred to a later phase.
 ## Repository layout
 
 ```
-backend/            FastAPI app (routes → services → repositories → models)
+backend/            FastAPI app (routes → controllers → services → repositories → models)
 frontend/           Vite + React + TypeScript app
 docs/               vision and tech-stack docs
+.claude/            project agents + skills (e.g. the /sonnet-review code-review skill)
 docker-compose.yml  dev stack (backend + frontend + MongoDB) with hot reload
 ```
 
@@ -66,3 +88,30 @@ the images / named volumes so the host can't shadow them. Stop with
 `docker compose down` (add `-v` to also drop the Mongo data volume).
 
 Prefer running without Docker? See `backend/README.md` and `frontend/README.md`.
+
+## Configuration
+
+Backend settings live in `backend/.env` (copy from `backend/.env.example`). Two
+secrets must be set to real values before any production deployment — the app
+**refuses to boot in `APP_ENV=production`** while they're left at the dev defaults:
+
+- `ENCRYPTION_KEY` — Fernet key protecting stored API keys / GitHub tokens.
+  Generate with
+  `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+- `JWT_SECRET` — signing secret for auth tokens.
+
+`ALLOWED_ORIGINS` (comma-separated) sets the CORS origins for non-dev frontends.
+Full list of variables is in `backend/README.md`.
+
+## Code review
+
+`/sonnet-review` is a project skill that reviews the current git diff — for
+correctness bugs, security, and the project's DRY/SOLID/layering rules — on the
+**Sonnet** model in an isolated context. It's read-only; run it before committing
+or opening a PR:
+
+```
+/sonnet-review            # this branch's diff vs main
+/sonnet-review staged     # only staged changes
+/sonnet-review backend/src
+```
