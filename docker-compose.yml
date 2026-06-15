@@ -6,9 +6,9 @@
 # - frontend : Vite dev server + HMR      (http://localhost:5173)
 # - mongo    : MongoDB                     (localhost:27017)
 #
-# Source folders are bind-mounted, so edits on the host reload live in the
-# containers. node_modules and the python venv are kept in the image / named
-# volumes so the host doesn't shadow them.
+# Source folders are bind-mounted, so edits on the host reload live in the. 
+# containers. node_modules and the python venv are kept in the image / named. 
+# volumes so the host doesn't shadow them.  
 
 services:
   mongo:
