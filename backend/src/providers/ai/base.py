@@ -11,7 +11,12 @@ from abc import ABC, abstractmethod
 
 import httpx
 
-from ...core.exceptions import UnauthorizedError, UpstreamError
+from ...core.exceptions import (
+    ServiceUnavailableError,
+    UnauthorizedError,
+    UpstreamError,
+)
+from .agent import AgentTool, ToolExecutor
 
 
 class IAIProvider(ABC):
@@ -28,6 +33,28 @@ class IAIProvider(ABC):
         endpoint). The ``model`` name is not verified here — an unknown model is
         accepted at save time and would only surface when inference is attempted.
         """
+
+    async def run_agent(
+        self,
+        *,
+        system: str,
+        prompt: str,
+        tools: list[AgentTool],
+        execute_tool: ToolExecutor,
+        model: str,
+        api_key: str,
+        client: httpx.AsyncClient,
+        max_iterations: int,
+    ) -> str:
+        """Drive a tool-use loop until the model returns a final answer.
+
+        Concrete providers override this with their own wire format. The default
+        is a clear "not yet supported" so the agent abstraction is provider-
+        agnostic while implementations are added one at a time.
+        """
+        raise ServiceUnavailableError(
+            f"Agent runs are not yet supported for provider '{self.name}'."
+        )
 
 
 def _raise_for_status(response: httpx.Response, provider: str) -> None:

@@ -51,6 +51,11 @@ class Settings(BaseSettings):
     # Cap README content stored/returned, so a huge file can't bloat the response.
     readme_max_chars: int = 50_000
 
+    # Agent — max tool-use turns per run, and the cap on a single file read fed
+    # back to the model (keeps one giant file from blowing the context window).
+    agent_max_iterations: int = 12
+    agent_read_file_max_chars: int = 20_000
+
     @property
     def cors_origins(self) -> list[str]:
         """allowed_origins parsed into a clean list."""

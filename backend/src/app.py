@@ -17,10 +17,17 @@ from .config.database import get_database
 from .config.settings import get_settings
 from .core.exceptions import AppError
 from .dependencies.container import close_http_client
+from .repositories.agent_run_repository import AgentRunRepository
 from .repositories.ai_config_repository import AIConfigRepository
 from .repositories.repository_repository import RepositoryRepository
 from .repositories.user_repository import UserRepository
-from .routes import ai_config_router, health_router, repository_router, user_router
+from .routes import (
+    agent_router,
+    ai_config_router,
+    health_router,
+    repository_router,
+    user_router,
+)
 
 
 @asynccontextmanager
@@ -32,6 +39,7 @@ async def lifespan(app: FastAPI):
     await UserRepository(database.db).ensure_indexes()
     await AIConfigRepository(database.db).ensure_indexes()
     await RepositoryRepository(database.db).ensure_indexes()
+    await AgentRunRepository(database.db).ensure_indexes()
     try:
         yield
     finally:
@@ -64,6 +72,7 @@ def create_app() -> FastAPI:
     app.include_router(user_router)
     app.include_router(ai_config_router)
     app.include_router(repository_router)
+    app.include_router(agent_router)
     return app
 
 

@@ -15,15 +15,18 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from ..config.database import Database, get_database
 from ..config.settings import get_settings
+from ..controllers.agent_controller import AgentController
 from ..controllers.ai_config_controller import AIConfigController
 from ..controllers.repository_controller import RepositoryController
 from ..controllers.user_controller import UserController
 from ..core.exceptions import UnauthorizedError
 from ..core.security import decode_access_token
 from ..providers.github.client import GitHubClient
+from ..repositories.agent_run_repository import AgentRunRepository
 from ..repositories.ai_config_repository import AIConfigRepository
 from ..repositories.repository_repository import RepositoryRepository
 from ..repositories.user_repository import UserRepository
+from ..services.agent_service import AgentService
 from ..services.ai_config_service import AIConfigService
 from ..services.repository_service import RepositoryService
 from ..services.user_service import UserService
@@ -82,6 +85,25 @@ def get_repository_controller(
         settings.readme_max_chars,
     )
     return RepositoryController(service)
+
+
+def get_agent_controller(
+    database: Database = Depends(get_database),
+) -> AgentController:
+    settings = get_settings()
+    http_client = get_http_client()
+    github_client = GitHubClient(http_client, settings.github_http_timeout_seconds)
+    service = AgentService(
+        AgentRunRepository(database.db),
+        RepositoryRepository(database.db),
+        AIConfigRepository(database.db),
+        github_client,
+        http_client,
+        settings.encryption_key,
+        settings.agent_max_iterations,
+        settings.agent_read_file_max_chars,
+    )
+    return AgentController(service)
 
 
 def get_current_user_id(
