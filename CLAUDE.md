@@ -1,6 +1,6 @@
-# CLAUDE.md
+# CLAUDE.md 
 
-## About the Project
+## About the Project 
 
 **Eureka** is a low-code add-on installed *inside* self-hosted open-source apps. The user deploys their own copy of an open-source product (the "foundation project"), drops Eureka inside it, logs in, points at a page, and describes a feature in plain language — Eureka's AI agent builds that feature directly into their instance. No fork, no patches, no coding required.
 
